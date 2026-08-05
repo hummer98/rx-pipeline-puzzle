@@ -22,6 +22,23 @@ definitions (`STAGES`) and cycle structure (`CYCLES`) in
 README / CONTRIBUTING files. The *code* is MIT licensed; see LICENSE.
 
 
+適用外 / Not covered
+--------------------
+
+  - `prototype/assets/audio/` 配下の音源（BGM・効果音）
+
+これらは ElevenLabs の API で生成した AI 音声で、その利用条件は生成元
+サービスの規約に従います。本プロジェクトは自身が保有しない権利を再許諾
+できないため、音源には CC BY 4.0 を適用していません。詳細と再生成の手順は
+`prototype/assets/audio/NOTICE.md` を参照してください。
+
+The audio files under `prototype/assets/audio/` are AI-generated with the
+ElevenLabs API and are **not** covered by this CC BY 4.0 licence; their
+use is governed by ElevenLabs' terms. See
+`prototype/assets/audio/NOTICE.md` for details and for how to regenerate
+your own.
+
+
 許諾内容 / You are free to
 --------------------------
 

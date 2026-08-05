@@ -83,6 +83,7 @@ Analytics are **off by default** — `prototype/analytics.js` ships with `provid
 | --- | --- |
 | Code (`prototype/*.js`, `*.css`, `*.html`) | [MIT](LICENSE) |
 | Stage definitions (`STAGES`), docs, images | [CC BY 4.0](LICENSE-CONTENT) |
+| Music & sound effects (`prototype/assets/audio/`) | Not covered — AI-generated, see [NOTICE](prototype/assets/audio/NOTICE.md) |
 
 ## Disclaimer
 

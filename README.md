@@ -148,6 +148,7 @@ python3 -m http.server 8000 --directory prototype
 | --- | --- |
 | コード（`prototype/*.js`, `*.css`, `*.html`） | [MIT](LICENSE) |
 | ステージ定義（`STAGES`）・ドキュメント・画像 | [CC BY 4.0](LICENSE-CONTENT) |
+| BGM・効果音（`prototype/assets/audio/`） | ElevenLabs 生成物のため対象外 — [NOTICE](prototype/assets/audio/NOTICE.md) |
 
 ## 免責
 
