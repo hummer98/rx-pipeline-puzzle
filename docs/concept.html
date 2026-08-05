@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReactiveExtream Concept Paper</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --ink: #17212f;
+      --muted: #5b6575;
+      --line: #d8dde6;
+      --panel: #ffffff;
+      --accent: #0f766e;
+      --accent-2: #2563eb;
+      --warn: #c2410c;
+      --ok: #15803d;
+      --bad: #b91c1c;
+      --slot: #eef2f7;
+      --shadow: 0 10px 30px rgba(23, 33, 47, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 48px 24px 40px;
+    }
+
+    header .inner,
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    header p {
+      max-width: 760px;
+      margin: 14px 0 0;
+      color: #d1d5db;
+      font-size: 18px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 56px);
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin: 0 0 18px;
+    }
+
+    h3 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
+    main {
+      padding: 32px 20px 72px;
+    }
+
+    section {
+      margin-top: 34px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card p,
+    .card ul {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .card ul {
+      padding-left: 20px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #e7f5f2;
+      color: #0f5f59;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .mock {
+      background: #fdfefe;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .mock-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      background: #17212f;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .icon-button,
+    .speed {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      min-height: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 6px;
+      color: white;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .mock-body {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .lane {
+      position: relative;
+      min-height: 88px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .lane-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .timeline {
+      position: relative;
+      height: 38px;
+      border-top: 2px solid #ccd3df;
+    }
+
+    .tick {
+      position: absolute;
+      top: -6px;
+      width: 1px;
+      height: 12px;
+      background: #a8b1c2;
+    }
+
+    .event {
+      position: absolute;
+      top: -15px;
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      border: 2px solid var(--accent-2);
+      color: #1e3a8a;
+      font-size: 12px;
+      font-weight: 800;
+      transform: translateX(-50%);
+    }
+
+    .event.goal {
+      background: #dcfce7;
+      border-color: var(--ok);
+      color: #14532d;
+    }
+
+    .event.bad {
+      background: #fee2e2;
+      border-color: var(--bad);
+      color: #7f1d1d;
+    }
+
+    .event.ghost {
+      background: transparent;
+      border-style: dashed;
+      border-color: #6b7280;
+      color: #4b5563;
+    }
+
+    .complete {
+      position: absolute;
+      top: -16px;
+      width: 20px;
+      height: 32px;
+      border-right: 3px solid #111827;
+      transform: translateX(-50%);
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef2f7;
+    }
+
+    .parts {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .part,
+    .slot {
+      min-width: 150px;
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid #cfd7e5;
+      background: white;
+    }
+
+    .part strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+
+    .part span {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+    }
+
+    .slot {
+      background: var(--slot);
+      border-style: dashed;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .compare {
+      position: relative;
+      min-height: 118px;
+    }
+
+    .compare .timeline {
+      margin-top: 36px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 2px solid currentColor;
+    }
+
+    .multi-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 12px;
+    }
+
+    .side-panel {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .mini-lane {
+      min-height: 60px;
+      padding: 8px;
+      border: 1px solid #d9e0ea;
+      border-radius: 6px;
+      background: white;
+    }
+
+    .mini-lane .timeline {
+      height: 26px;
+    }
+
+    .mini-lane .event {
+      width: 24px;
+      height: 24px;
+      top: -13px;
+      font-size: 11px;
+    }
+
+    .note {
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      background: #eefdfa;
+      color: #164e48;
+      border-radius: 0 8px 8px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eef2f7;
+      font-size: 13px;
+    }
+
+    td {
+      color: var(--muted);
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.94em;
+      color: #0f5f59;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        padding: 34px 18px 30px;
+      }
+
+      main {
+        padding-inline: 14px;
+      }
+
+      .mock-title {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .multi-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .part,
+      .slot {
+        min-width: 132px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="inner">
+      <h1>ReactiveExtream</h1>
+      <p>ReactiveXのストリーム変換を、タイムライン上で組み立てて検証するパイプラインプログラミングパズル。（旧仮題: Rx Pipeline Puzzle）</p>
+      <div class="tag-row" aria-label="keywords">
+        <span class="tag">stream puzzle</span>
+        <span class="tag">marble diagram</span>
+        <span class="tag">map / filter / scan</span>
+        <span class="tag">playable learning</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>コンセプト</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>プレイヤーの目的</h3>
+          <p>与えられた入力ストリームから、関数パネルを順番に接続して正解ストリームを作る。再生が1周して、値・時刻・完了イベントが一致すればステージクリア。</p>
+        </article>
+        <article class="card">
+          <h3>中核の面白さ</h3>
+          <p>コードを書く代わりに、時間軸に流れるイベントを見ながら関数の効果を試す。失敗が即座に出力差分として見えるため、論理パズルとして試行錯誤できる。</p>
+        </article>
+        <article class="card">
+          <h3>設計原則</h3>
+          <p>ReactiveX完全互換よりも、パズルとしての見通しを優先する。最初は単一ストリーム、固定タイムライン、少数の関数パーツで始める。</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>基本ルール</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>要素</th>
+            <th>初期仕様</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>イベント</td>
+            <td><code>next(value)</code> と <code>complete</code> を扱う。エラーは初期プロトタイプでは後回し。</td>
+          </tr>
+          <tr>
+            <td>時間</td>
+            <td>連続時間ではなく、タイムライン上の離散ステップとして扱う。表示上は横方向の位置で示す。</td>
+          </tr>
+          <tr>
+            <td>関数パネル</td>
+            <td><code>map</code>, <code>filter</code>, <code>take</code>, <code>skip</code> から開始する。各パネルは入力例と出力例を持つ。</td>
+          </tr>
+          <tr>
+            <td>正解判定</td>
+            <td>現在出力と正解出力のイベント列を比較する。値、順序、時刻、完了位置が一致したら正解。</td>
+          </tr>
+          <tr>
+            <td>操作</td>
+            <td>再生、一時停止、リセット、速度変更を用意する。パイプライン変更時は現在出力を即時再計算する。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>画面サンプル案 A: 分離レーン型</h2>
+      <div class="mock">
+        <div class="mock-title">
+          <span>Stage 01 / filter(x >= 3) を作る</span>
+          <div class="controls" aria-label="playback controls">
+            <span class="icon-button">▶</span>
+            <span class="icon-button">Ⅱ</span>
+            <span class="icon-button">↺</span>
+            <span class="speed">1x</span>
+          </div>
+        </div>
+        <div class="mock-body">
+          <div class="lane">
+            <div class="lane-title"><span>Input Stream</span><span>values enter from left to right</span></div>
+            <div class="timeline">
+              <span class="tick" style="left: 12%"></span>
+              <span class="tick" style="left: 28%"></span>
+              <span class="tick" style="left: 44%"></span>
+              <span class="tick" style="left: 60%"></span>
+              <span class="tick" style="left: 76%"></span>
+              <span class="event" style="left: 12%">1</span>
+              <span class="event" style="left: 28%">4</span>
+              <span class="event" style="left: 44%">2</span>
+              <span class="event" style="left: 60%">5</span>
+              <span class="event" style="left: 76%">3</span>
+              <span class="complete" style="left: 90%"></span>
+            </div>
+          </div>
+
+          <div class="pipeline">
+            <div class="lane-title"><span>Pipeline Builder</span><span>drag parts, edit params</span></div>
+            <div class="parts">
+              <div class="part"><strong>filter</strong><span>x >= 3</span></div>
+              <div class="slot">+ add part</div>
+              <div class="slot">+ add part</div>
+            </div>
+          </div>
+
+          <div class="lane">
+            <div class="lane-title"><span>Current Output</span><span>generated by pipeline</span></div>
+            <div class="timeline">
+              <span class="event goal" style="left: 28%">4</span>
+              <span class="event goal" style="left: 60%">5</span>
+              <span class="event goal" style="left: 76%">3</span>
+              <span class="complete" style="left: 90%"></span>
+            </div>
+          </div>
+
+          <div class="lane">
+            <div class="lane-title"><span>Goal Stream</span><span>must match after one loop</span></div>
+            <div class="timeline">
+              <span class="event goal" style="left: 28%">4</span>
+              <span class="event goal" style="left: 60%">5</span>
+              <span class="event goal" style="left: 76%">3</span>
+              <span class="complete" style="left: 90%"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note">最初の実装に向く案。情報が上下に分かれており、初心者が入力、変換、出力、正解の関係を追いやすい。</p>
+    </section>
+
+    <section>
+      <h2>画面サンプル案 B: 差分オーバーレイ型</h2>
+      <div class="mock">
+        <div class="mock-title">
+          <span>Stage 03 / filter + map</span>
+          <div class="controls" aria-label="playback controls">
+            <span class="icon-button">▶</span>
+            <span class="icon-button">Ⅱ</span>
+            <span class="icon-button">↺</span>
+            <span class="speed">0.5x</span>
+            <span class="speed">2x</span>
+          </div>
+        </div>
+        <div class="mock-body">
+          <div class="lane">
+            <div class="lane-title"><span>Input Stream</span><span>1, 2, 3, 4, 5</span></div>
+            <div class="timeline">
+              <span class="event" style="left: 12%">1</span>
+              <span class="event" style="left: 28%">2</span>
+              <span class="event" style="left: 44%">3</span>
+              <span class="event" style="left: 60%">4</span>
+              <span class="event" style="left: 76%">5</span>
+              <span class="complete" style="left: 90%"></span>
+            </div>
+          </div>
+
+          <div class="pipeline">
+            <div class="lane-title"><span>Pipeline Builder</span><span>current attempt has one extra event</span></div>
+            <div class="parts">
+              <div class="part"><strong>filter</strong><span>x >= 2</span></div>
+              <div class="part"><strong>map</strong><span>x * 2</span></div>
+              <div class="slot">+ add part</div>
+            </div>
+          </div>
+
+          <div class="lane compare">
+            <div class="lane-title"><span>Output vs Goal</span><span>overlay comparison</span></div>
+            <div class="legend">
+              <span class="legend-item"><span class="dot" style="color: var(--ok)"></span>match</span>
+              <span class="legend-item"><span class="dot" style="color: var(--bad)"></span>extra</span>
+              <span class="legend-item"><span class="dot" style="color: #6b7280"></span>missing</span>
+            </div>
+            <div class="timeline">
+              <span class="event bad" style="left: 28%">4</span>
+              <span class="event goal" style="left: 44%">6</span>
+              <span class="event goal" style="left: 60%">8</span>
+              <span class="event goal" style="left: 76%">10</span>
+              <span class="complete" style="left: 90%"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note">プレイ感が良い候補。正解との差分が1本のレーンに集約されるため、失敗理由が見えやすい。実装では判定ロジックと表示ルールを丁寧に分けたい。</p>
+    </section>
+
+    <section>
+      <h2>画面サンプル案 C: 上級ステージ型</h2>
+      <div class="mock">
+        <div class="mock-title">
+          <span>Stage 12 / combineLatest の導入</span>
+          <div class="controls" aria-label="playback controls">
+            <span class="icon-button">▶</span>
+            <span class="icon-button">Ⅱ</span>
+            <span class="icon-button">↺</span>
+            <span class="speed">1x</span>
+          </div>
+        </div>
+        <div class="mock-body multi-layout">
+          <div class="side-panel">
+            <div class="lane-title"><span>Input Streams</span><span>A and B</span></div>
+            <div class="mini-lane">
+              <div class="timeline">
+                <span class="event" style="left: 18%">A1</span>
+                <span class="event" style="left: 52%">A2</span>
+                <span class="event" style="left: 80%">A3</span>
+              </div>
+            </div>
+            <div class="mini-lane">
+              <div class="timeline">
+                <span class="event" style="left: 32%">B1</span>
+                <span class="event" style="left: 62%">B2</span>
+              </div>
+            </div>
+            <div class="pipeline">
+              <div class="parts">
+                <div class="part"><strong>combineLatest</strong><span>(a, b) => a + b</span></div>
+                <div class="part"><strong>take</strong><span>3</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="side-panel">
+            <div class="lane-title"><span>Output Comparison</span><span>advanced overlay</span></div>
+            <div class="lane compare">
+              <div class="timeline">
+                <span class="event goal" style="left: 32%">A1B1</span>
+                <span class="event goal" style="left: 52%">A2B1</span>
+                <span class="event ghost" style="left: 62%">A2B2</span>
+                <span class="complete" style="left: 88%"></span>
+              </div>
+            </div>
+            <div class="card">
+              <h3>上級UIの課題</h3>
+              <ul>
+                <li>複数入力の因果関係を見せる必要がある。</li>
+                <li>同時刻イベントの順序ルールを固定する必要がある。</li>
+                <li>初心者UIより情報密度が上がるため、折りたたみやズームが必要になる。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="note">将来の方向性。最初から作るより、単一ストリームの手触りを固めた後に拡張した方が安全。</p>
+    </section>
+
+    <section>
+      <h2>関数パーツの初期セット</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><code>map</code></h3>
+          <p>各イベントの値を変換する。例: <code>x * 2</code>, <code>x + 1</code>, <code>String(x)</code></p>
+        </article>
+        <article class="card">
+          <h3><code>filter</code></h3>
+          <p>条件に合うイベントだけを通す。例: <code>x >= 3</code>, <code>x % 2 === 0</code></p>
+        </article>
+        <article class="card">
+          <h3><code>take</code></h3>
+          <p>先頭から指定個数のイベントだけを通す。完了位置の理解にも使える。</p>
+        </article>
+        <article class="card">
+          <h3><code>skip</code></h3>
+          <p>先頭から指定個数のイベントを捨てる。<code>take</code> と組み合わせると範囲選択の問題を作りやすい。</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>採用候補</h2>
+      <div class="card">
+        <p>最初のプロトタイプは案Aを基本にし、出力と正解の部分だけ案Bのオーバーレイ表示を取り込む構成がよい。入力とパイプラインは分かりやすく分け、失敗理由は1本の比較レーンで即座に見せる。</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

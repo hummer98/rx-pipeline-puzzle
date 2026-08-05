@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReactiveExtream — RxJS のオペレータをパズルで学ぶ / RxJS pipeline puzzle</title>
+  <meta name="description" content="RxJS / ReactiveX のストリームオペレータ 39 種類を、マーブル図（marble diagram）を組み立てるパズルとして学ぶブラウザゲーム。94 ステージ・12 サイクル。インストール不要・依存ゼロ。Learn RxJS Observable operators by building marble diagrams.">
+  <link rel="canonical" href="https://hummer98.dev/rx-pipeline-puzzle/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ReactiveExtream">
+  <meta property="og:title" content="ReactiveExtream — RxJS のオペレータをパズルで学ぶ">
+  <meta property="og:description" content="map / debounceTime / switchMap … RxJS の 39 オペレータを、マーブル図を組み立てて答え合わせする 94 ステージのパズルに。ブラウザだけで遊べます。">
+  <meta property="og:url" content="https://hummer98.dev/rx-pipeline-puzzle/">
+  <meta property="og:image" content="https://hummer98.dev/rx-pipeline-puzzle/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ReactiveExtream — RxJS のオペレータをパズルで学ぶ">
+  <meta name="twitter:description" content="RxJS の 39 オペレータ × 94 ステージ。マーブル図を「読む」から「組み立てる」へ。">
+  <meta name="twitter:image" content="https://hummer98.dev/rx-pipeline-puzzle/assets/og.png">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="analytics.js"></script>
+  <script>
+    // index.html?reset=1 で保存データ（クリア記録・音量・既読カード）を消す。
+    // 別ブラウザでも URL を開くだけでリセットできるようにするため、
+    // ゲーム本体ではなくこの入口ページで処理する。
+    if (new URLSearchParams(location.search).has("reset")) {
+      try {
+        for (const k of Object.keys(localStorage)) {
+          if (k.startsWith("rx-pipeline-puzzle/")) localStorage.removeItem(k);
+        }
+      } catch { /* localStorage が使えない環境ではそのまま続行 */ }
+      location.replace("index.html?didreset=1");
+    }
+  </script>
+</head>
+<body class="landing-body">
+  <div class="lang-switch" role="group">
+    <span class="lang-label" data-i18n="lang.label">言語</span>
+    <button type="button" data-lang="ja" title="日本語" aria-label="日本語">🇯🇵<span>日本語</span></button>
+    <button type="button" data-lang="en" title="English" aria-label="English">🇺🇸<span>English</span></button>
+  </div>
+
+  <main class="landing">
+    <h1 class="landing-title">Reactive<span class="title-stream">Extream</span></h1>
+    <p class="landing-sub" id="landing-sub" data-i18n="landing.sub">マーブル図を「読む」から「組み立てる」へ。</p>
+    <p class="landing-tagline" data-i18n-html="landing.tagline">
+      流れてくるイベントを、関数パイプラインで組み替えるパズルゲーム。<br>
+      コードを書く代わりに、マーブル図の上で <code>map</code> / <code>debounceTime</code> / <code>switchMap</code> の効果を試そう。
+    </p>
+
+    <div class="landing-demo" aria-label="遊び方の例">
+      <div class="demo-stream">
+        <span class="event">1</span>
+        <span class="event">2</span>
+        <span class="event">3</span>
+      </div>
+      <span class="demo-arrow">→</span>
+      <span class="demo-op">map <code>x × 2</code></span>
+      <span class="demo-arrow">→</span>
+      <div class="demo-stream">
+        <span class="event event--match">2</span>
+        <span class="event event--match">4</span>
+        <span class="event event--match">6</span>
+      </div>
+    </div>
+
+    <section class="landing-steps">
+      <article class="landing-card">
+        <h3 data-i18n="landing.step1.h">1. 観察する</h3>
+        <p data-i18n-html="landing.step1.p">入力ストリームと正解ストリームをタイムライン（マーブル図）で見比べて、何が起きればよいか考える。</p>
+      </article>
+      <article class="landing-card">
+        <h3 data-i18n="landing.step2.h">2. 組み立てる</h3>
+        <p data-i18n-html="landing.step2.p"><code>map</code> / <code>filter</code> / <code>scan</code> / <code>debounceTime</code> / <code>switchMap</code> など <strong>39 種類</strong>のオペレータをつなぎ、パラメータを調整する。</p>
+      </article>
+      <article class="landing-card">
+        <h3 data-i18n="landing.step3.h">3. 差分を見る</h3>
+        <p data-i18n-html="landing.step3.p">出力は即座に再計算され、正解との不足・余分・値違い・完了位置ずれが色で見える。一致すればクリア！</p>
+      </article>
+    </section>
+
+    <p class="reset-note" id="reset-note" data-i18n="landing.resetDone" hidden>✓ 保存データをリセットしました。最初から遊べます。</p>
+
+    <a class="start-button" id="start-button" href="game.html" data-i18n="landing.start">ゲームをはじめる ▶</a>
+
+    <p class="landing-stats" data-i18n="landing.stats">
+      94 ステージ / 12 サイクル / 39 オペレータ ・ インストール不要 ・ 依存ゼロ ・ クリア時に RxJS コードを自動生成
+    </p>
+
+    <footer class="landing-footer">
+      <p>
+        <a href="https://github.com/hummer98/rx-pipeline-puzzle" data-i18n="landing.repo">GitHub リポジトリ</a> ・
+        <a href="docs/concept.html" data-i18n="landing.concept">コンセプト</a> ・
+        <a href="https://github.com/hummer98/rx-pipeline-puzzle/blob/main/CONTRIBUTING.md" data-i18n="landing.contribute">ステージを投稿する</a>
+      </p>
+      <p class="landing-reset">
+        <a href="index.html?reset=1" data-i18n="landing.resetLink">進行状況をリセット</a><span data-i18n="landing.resetNote">（クリア記録・音量設定・解説の表示設定を消します）</span>
+      </p>
+      <p class="landing-disclaimer" data-i18n-html="landing.disclaimer">
+        ReactiveExtream は RxJS を学ぶための<strong>非公式</strong>のファンプロジェクトです。
+        ReactiveX / RxJS の公式プロジェクトおよびその関係者とは一切関係がありません。
+        オペレータの挙動は学習しやすさのため一部簡略化しています（ゲーム内で注記します）。
+      </p>
+    </footer>
+  </main>
+  <script src="i18n-en.js"></script>
+  <script src="i18n.js"></script>
+  <script>
+    // ?reset=1 のリダイレクト後に一度だけ完了メッセージを見せる
+    if (new URLSearchParams(location.search).has("didreset")) {
+      document.getElementById("reset-note").hidden = false;
+      history.replaceState(null, "", "index.html");
+    }
+
+    // 言語スイッチャー。選択は localStorage に残るので、ゲーム画面にも引き継がれる
+    function renderLang() {
+      I18N.applyStatic();
+      const cur = I18N.get();
+      for (const b of document.querySelectorAll(".lang-switch button")) {
+        b.classList.toggle("active", b.dataset.lang === cur);
+        b.setAttribute("aria-pressed", String(b.dataset.lang === cur));
+      }
+      document.title = cur === "en"
+        ? "ReactiveExtream — Learn RxJS operators as a puzzle"
+        : "ReactiveExtream — RxJS のオペレータをパズルで学ぶ / RxJS pipeline puzzle";
+    }
+    for (const b of document.querySelectorAll(".lang-switch button")) {
+      b.addEventListener("click", () => { I18N.set(b.dataset.lang); renderLang(); });
+    }
+    renderLang();
+  </script>
+  <!--
+    「ゲームをはじめる」のクリックは計測していない。遷移と送信が競合して
+    取りこぼすため、起動率は game.html のページビュー ÷ このページの
+    ページビューで求める（docs/metrics.md 参照）。
+  -->
+</body>
+</html>

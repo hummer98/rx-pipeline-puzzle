@@ -1,0 +1,1043 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --ink: #17212f;
+  --muted: #5b6575;
+  --line: #d8dde6;
+  --panel: #ffffff;
+  --accent: #0f766e;
+  --accent-2: #2563eb;
+  --ok: #15803d;
+  --bad: #b91c1c;
+  --slot: #eef2f7;
+  --shadow: 0 6px 20px rgba(23, 33, 47, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---------- header ---------- */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 18px;
+  background: #111827;
+  color: white;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+
+.home-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-link:hover {
+  text-decoration: underline;
+}
+
+.stage-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #d1d5db;
+}
+
+.stage-picker select {
+  font-size: 13px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #1f2937;
+  color: white;
+}
+
+.playback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.icon-button,
+.speeds button {
+  min-width: 34px;
+  min-height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 6px;
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.icon-button:hover,
+.speeds button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.speeds {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.speeds button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ---------- audio settings ---------- */
+
+.audio-wrap {
+  position: relative;
+}
+
+.audio-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  width: 220px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  color: var(--ink);
+}
+
+.audio-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.audio-row input[type="range"] {
+  width: 120px;
+}
+
+.audio-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* ---------- layout ---------- */
+
+main {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 16px 16px 60px;
+  display: grid;
+  gap: 12px;
+}
+
+.stage-info h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.stage-info p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---------- lanes ---------- */
+
+.lane,
+.pipeline {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+}
+
+.lane-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lane-sub {
+  font-weight: 500;
+  text-transform: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.track {
+  position: relative;
+  height: 74px;
+  margin: 0 22px;
+}
+
+.track-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 34px;
+  height: 2px;
+  background: #ccd3df;
+}
+
+.tick {
+  position: absolute;
+  top: 29px;
+  width: 1px;
+  height: 12px;
+  background: #a8b1c2;
+  transform: translateX(-50%);
+}
+
+.tick-label {
+  position: absolute;
+  top: 46px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #a8b1c2;
+}
+
+.event {
+  position: absolute;
+  top: 18px;
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  border: 2px solid var(--accent-2);
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 800;
+  transform: translateX(-50%);
+  transition: opacity 0.15s;
+}
+
+.event--match {
+  background: #dcfce7;
+  border-color: var(--ok);
+  color: #14532d;
+}
+
+.event--extra,
+.event--wrong {
+  background: #fee2e2;
+  border-color: var(--bad);
+  color: #7f1d1d;
+}
+
+.event--ghost {
+  background: transparent;
+  border-style: dashed;
+  border-color: #6b7280;
+  color: #4b5563;
+}
+
+/* 値違い時のゴースト: 出力イベントと同時刻なので少し上に小さく表示する */
+.event--ghost-paired {
+  top: -9px;
+  min-width: 24px;
+  height: 24px;
+  font-size: 11px;
+  background: var(--panel);
+}
+
+/* 3段階ヒント */
+.hint-row {
+  margin-top: 8px;
+}
+
+#btn-hint {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: white;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 4px 14px;
+}
+
+#btn-hint.nudge {
+  border-color: #d97706;
+  color: #92400e;
+  animation: badge-blink 0.9s ease-in-out infinite;
+}
+
+#hint-box {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #78350f;
+  background: #fef3c7;
+  border-radius: 6px;
+}
+
+/* specMode: 正解レーンの未開示プレースホルダ */
+.goal-hidden {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 0 12px;
+  text-align: center;
+}
+
+/* イベント円(top:18〜50)と同時刻でも位置が読めるよう、円より縦に長くする */
+.complete-mark {
+  position: absolute;
+  top: 4px;
+  height: 56px;
+  width: 0;
+  border-right: 3px solid #111827;
+  transform: translateX(-50%);
+}
+
+.complete-mark--ghost {
+  border-right-style: dashed;
+  border-right-color: #6b7280;
+}
+
+.complete-mark--bad {
+  border-right-color: var(--bad);
+}
+
+/* エラー終端（✕）: 完了バーの上に ✕ を重ねる */
+.complete-mark--x {
+  border-right-color: var(--bad);
+}
+
+.complete-mark--x::after {
+  content: "✕";
+  position: absolute;
+  top: -17px;
+  left: -6px;
+  color: var(--bad);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.future {
+  opacity: 0.25;
+}
+
+.playhead {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: rgba(15, 118, 110, 0.55);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* ---------- pipeline ---------- */
+
+.pipeline {
+  background: var(--slot);
+}
+
+.nodes {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+  min-height: 96px;
+  align-items: stretch;
+}
+
+.node,
+.node-placeholder {
+  min-width: 180px;
+  border-radius: 8px;
+  border: 1px solid #cfd7e5;
+  background: white;
+  padding: 8px 10px;
+  flex-shrink: 0;
+}
+
+.node-placeholder {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.node-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+
+.node-head strong {
+  font-size: 13px;
+  color: var(--accent);
+  word-break: break-all;
+}
+
+.node-noparam {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* 2入力パーツ: B がこの位置で合流することを示す */
+.node--binary {
+  border-color: var(--accent-2);
+  background: #eff6ff;
+}
+
+.node-b-badge {
+  margin-bottom: 4px;
+  color: #1e40af;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.pipeline-hint {
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: none;
+  font-size: 11px;
+}
+
+.node-desc {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.node-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.node-params select,
+.node-params input {
+  font-size: 12px;
+  padding: 3px 4px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: white;
+}
+
+.node-params input[type="number"] {
+  width: 62px;
+}
+
+.node-tools {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.node-tools button {
+  min-width: 28px;
+  min-height: 24px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #f8fafc;
+  color: var(--ink);
+}
+
+.node-tools button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.node-tools .remove {
+  margin-left: auto;
+  color: var(--bad);
+}
+
+.add-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* 全パーツ開放時にボタンが多くても gap を効かせて折り返す */
+.add-buttons {
+  display: contents;
+}
+
+/* パイプライン B: 青い合流パーツと同系色で対応づける */
+.pipeline--b {
+  background: #eef4fd;
+  border-left: 4px solid var(--accent-2);
+}
+
+/* パーツ追加ボタンのホバー説明ポップアップ */
+.add-row button {
+  position: relative;
+}
+
+.add-row button[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: max-content;
+  max-width: 300px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #17212f;
+  color: white;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: left;
+  white-space: pre-wrap;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.add-row button[data-tip]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  border: 5px solid transparent;
+  border-top-color: #17212f;
+  pointer-events: none;
+}
+
+.add-row button {
+  min-height: 28px;
+  padding: 2px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: white;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.add-row button:hover:not(:disabled) {
+  background: #e7f5f2;
+}
+
+.add-row button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---------- status & legend ---------- */
+
+.badge {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: none;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.badge.ok {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.badge.checking {
+  background: #fef3c7;
+  color: #92400e;
+  animation: badge-blink 0.9s ease-in-out infinite;
+}
+
+@keyframes badge-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 2px solid;
+}
+
+.dot-match { border-color: var(--ok); background: #dcfce7; }
+.dot-extra { border-color: var(--bad); background: #fee2e2; }
+.dot-ghost { border-color: #6b7280; border-style: dashed; }
+
+.complete-sample {
+  width: 3px;
+  height: 14px;
+  background: #111827;
+}
+
+/* ---------- clear overlay ---------- */
+
+.clear-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(17, 24, 39, 0.45);
+  z-index: 10;
+}
+
+/* display: grid が UA の [hidden] { display: none } を上書きしてしまうため明示する */
+.clear-overlay[hidden] {
+  display: none;
+}
+
+.clear-card {
+  background: white;
+  border-radius: 10px;
+  padding: 26px 34px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  max-width: 580px;
+}
+
+.clear-learn {
+  margin-bottom: 16px;
+}
+
+.clear-code {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  text-align: left;
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.clear-insight {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 13px;
+  color: #164e48;
+  background: #eefdfa;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+}
+
+.clear-notes {
+  margin: 0 0 6px;
+  text-align: left;
+  font-size: 11px;
+  color: #92400e;
+}
+
+.cycle-body {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.cycle-parts {
+  margin: 0 0 16px;
+  padding: 8px 10px;
+  background: var(--slot);
+  border-radius: 6px;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.clear-hide {
+  display: block;
+  text-align: right;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 4px 0 40px;
+}
+
+.app-footer button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: white;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 6px 14px;
+}
+
+.footer-note {
+  max-width: 720px;
+  margin: 14px auto 0;
+  padding: 0 20px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.footer-note a {
+  color: var(--accent);
+}
+
+.clear-card h2 {
+  margin: 0 0 8px;
+}
+
+.clear-card p {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.clear-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.clear-actions button {
+  min-height: 36px;
+  padding: 4px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: white;
+  font-size: 14px;
+}
+
+.clear-actions .primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+
+/* ---------- landing page ---------- */
+
+.landing-body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.landing {
+  /* ゲーム画面用の main { display: grid } を打ち消す */
+  display: block;
+  max-width: 720px;
+  padding: 48px 20px 64px;
+  text-align: center;
+}
+
+.landing-title {
+  margin: 0;
+  font-size: clamp(34px, 7vw, 52px);
+  line-height: 1.2;
+}
+
+/* Extream = Extreme × Stream の造語であることを色で示す */
+.landing-title .title-stream {
+  color: var(--accent);
+}
+
+/* 英語圏の検索・共有で拾われるためのサブタイトル */
+.landing-sub {
+  margin: 10px 0 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.landing-tagline {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.landing-tagline code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+  color: var(--ink);
+}
+
+.landing-stats {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.landing-footer {
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.landing-footer a {
+  color: var(--accent);
+}
+
+.landing-disclaimer {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  text-align: left;
+}
+
+.landing-demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 30px auto 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  width: fit-content;
+}
+
+.landing-demo .event {
+  position: static;
+  transform: none;
+}
+
+.demo-stream {
+  display: flex;
+  gap: 8px;
+}
+
+.demo-arrow {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.demo-op {
+  padding: 6px 14px;
+  border: 1px solid #cfd7e5;
+  border-radius: 8px;
+  background: white;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.demo-op code {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.landing-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.landing-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+
+.landing-card h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.landing-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.landing-card code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.94em;
+  color: #0f5f59;
+}
+
+/* ---------- language switch (landing) ---------- */
+
+.lang-switch {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lang-label {
+  margin-right: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.lang-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.lang-switch button span {
+  font-weight: 700;
+}
+
+.lang-switch button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lang-switch button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+@media (max-width: 560px) {
+  .lang-switch {
+    position: static;
+    justify-content: center;
+    padding-top: 14px;
+  }
+
+  .lang-switch button span {
+    display: none;
+  }
+}
+
+.reset-note {
+  margin: 24px 0 0;
+  color: var(--ok);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.landing-reset {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.start-button {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 13px 42px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: white;
+  font-size: 17px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(15, 118, 110, 0.35);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.start-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(15, 118, 110, 0.42);
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 640px) {
+  .app-header {
+    gap: 8px;
+  }
+
+  .playback {
+    margin-left: 0;
+  }
+
+  .track {
+    margin: 0 14px;
+  }
+
+  .node,
+  .node-placeholder {
+    min-width: 160px;
+  }
+}

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReactiveExtream — RxJS オペレータ パズル (marble diagram)</title>
+  <meta name="description" content="RxJS / ReactiveX の 39 オペレータをマーブル図の上で組み立てる 94 ステージのパズル。クリアすると自分の解が RxJS のコードとして生成されます。">
+  <link rel="canonical" href="https://hummer98.dev/rx-pipeline-puzzle/game.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ReactiveExtream">
+  <meta property="og:title" content="ReactiveExtream — RxJS オペレータ パズル">
+  <meta property="og:description" content="マーブル図を組み立てて RxJS の 39 オペレータを学ぶ。94 ステージ・ブラウザだけで遊べます。">
+  <meta property="og:url" content="https://hummer98.dev/rx-pipeline-puzzle/game.html">
+  <meta property="og:image" content="https://hummer98.dev/rx-pipeline-puzzle/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hummer98.dev/rx-pipeline-puzzle/assets/og.png">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="analytics.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1><a href="index.html" class="home-link" title="トップページへ">ReactiveExtream</a></h1>
+    <label class="stage-picker"><span data-i18n="app.stage">ステージ</span>
+      <select id="stage-select"></select>
+    </label>
+    <div class="playback" aria-label="再生コントロール">
+      <button id="btn-play" class="icon-button" data-i18n-title="app.play" title="再生 / 一時停止">▶</button>
+      <button id="btn-reset" class="icon-button" data-i18n-title="app.rewind" title="先頭に戻す">↺</button>
+      <div class="speeds" id="speed-buttons">
+        <button data-speed="0.5">0.5x</button>
+        <button data-speed="1" class="active">1x</button>
+        <button data-speed="2">2x</button>
+      </div>
+      <div class="audio-wrap">
+        <button id="btn-audio" class="icon-button" data-i18n-title="app.audio" title="サウンド設定" aria-expanded="false">🔊</button>
+        <div class="audio-panel" id="audio-panel" hidden>
+          <label class="audio-row">
+            <input type="checkbox" id="aud-mute"> <span data-i18n="audio.muteAll">すべてミュート</span>
+          </label>
+          <label class="audio-row"><span data-i18n="audio.master">全体</span> <input type="range" id="aud-master" min="0" max="1" step="0.05"></label>
+          <label class="audio-row"><span data-i18n="audio.music">BGM</span> <input type="range" id="aud-music" min="0" max="1" step="0.05"></label>
+          <label class="audio-row"><span data-i18n="audio.sfx">効果音</span> <input type="range" id="aud-sfx" min="0" max="1" step="0.05"></label>
+          <p class="audio-note" data-i18n="audio.note">BGM は既定でオフです。スライダーを上げると再生します。</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage-info">
+      <h2 id="stage-title"></h2>
+      <p id="stage-goal"></p>
+      <div class="hint-row">
+        <button id="btn-hint">💡 ヒント</button>
+        <p id="hint-box" hidden></p>
+      </div>
+    </section>
+
+    <section class="lane">
+      <div class="lane-head">
+        <span id="input-label-a">入力ストリーム</span>
+        <span class="lane-sub" id="input-desc"></span>
+      </div>
+      <div class="track" id="track-input"></div>
+    </section>
+
+    <section class="lane" id="lane-input-b" hidden>
+      <div class="lane-head">
+        <span id="input-label-b">入力ストリーム B</span>
+        <span class="lane-sub" id="input-desc-b"></span>
+      </div>
+      <div class="track" id="track-input-b"></div>
+    </section>
+
+    <section class="pipeline pipeline--b" id="pipeline-b" hidden>
+      <div class="lane-head">
+        <span><span data-i18n="pipe.titleB">パイプライン B</span> <span class="pipeline-hint" data-i18n="pipe.hintB">— 合流前に B を加工（未接続なら原本のまま）</span></span>
+      </div>
+      <div class="nodes" id="pipeline-nodes-b"></div>
+      <div class="add-row">
+        <span class="add-label" data-i18n="pipe.addParts">パーツを追加:</span>
+        <span class="add-buttons" id="add-buttons-b"></span>
+      </div>
+    </section>
+
+    <section class="pipeline">
+      <div class="lane-head">
+        <span><span id="pipeline-title">パイプライン</span> <span class="pipeline-hint" id="pipeline-hint"></span></span>
+        <span class="lane-sub" id="node-count"></span>
+      </div>
+      <div class="nodes" id="pipeline-nodes"></div>
+      <div class="add-row">
+        <span class="add-label" data-i18n="pipe.addParts">パーツを追加:</span>
+        <span class="add-buttons" id="add-buttons"></span>
+      </div>
+    </section>
+
+    <section class="lane">
+      <div class="lane-head">
+        <span data-i18n="lane.output">現在の出力</span>
+        <span id="status-badge" class="badge"></span>
+      </div>
+      <div class="track" id="track-output"></div>
+      <div class="legend">
+        <span class="legend-item"><span class="dot dot-match"></span><span data-i18n="legend.match">一致</span></span>
+        <span class="legend-item"><span class="dot dot-extra"></span><span data-i18n="legend.extra">余分 / 値違い</span></span>
+        <span class="legend-item"><span class="dot dot-ghost"></span><span data-i18n="legend.missing">不足（正解のみ）</span></span>
+        <span class="legend-item"><span class="complete-sample"></span><span data-i18n="legend.complete">完了</span></span>
+      </div>
+    </section>
+
+    <section class="lane">
+      <div class="lane-head">
+        <span data-i18n="lane.goal">正解ストリーム</span>
+        <span class="lane-sub" id="goal-sub">これと一致させる</span>
+      </div>
+      <div class="track" id="track-goal"></div>
+    </section>
+  </main>
+
+  <div class="clear-overlay" id="clear-overlay" hidden>
+    <div class="clear-card">
+      <h2 data-i18n="clear.title">🎉 ステージクリア！</h2>
+      <p id="clear-message"></p>
+      <div class="clear-learn" id="clear-learn">
+        <pre class="clear-code" id="clear-code"></pre>
+        <p class="clear-insight" id="clear-insight"></p>
+        <p class="clear-notes" id="clear-notes"></p>
+        <label class="clear-hide"><input type="checkbox" id="chk-hide-learn"> <span data-i18n="clear.hideLearn">この解説をもう表示しない</span></label>
+      </div>
+      <div class="clear-actions">
+        <button id="btn-next" class="primary" data-i18n="clear.next">次のステージへ</button>
+        <button id="btn-close-overlay" data-i18n="clear.close">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="clear-overlay" id="cycle-overlay" hidden>
+    <div class="clear-card">
+      <h2 id="cycle-title"></h2>
+      <p id="cycle-body" class="cycle-body"></p>
+      <p id="cycle-parts" class="cycle-parts"></p>
+      <div class="clear-actions">
+        <button id="btn-cycle-start" class="primary" data-i18n="cycle.start">はじめる</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <button id="btn-reset-learn" hidden data-i18n="clear.showLearnAgain">クリア時の解説を再び表示する</button>
+    <p class="footer-note">
+      <a href="index.html" data-i18n="footer.top">トップ</a> ・
+      <a href="https://github.com/hummer98/rx-pipeline-puzzle">GitHub</a>
+      <span data-i18n-html="footer.note">— ReactiveExtream は RxJS を学ぶための<strong>非公式</strong>のファンプロジェクトで、
+      ReactiveX / RxJS 公式とは関係ありません。オペレータの挙動は学習用に一部簡略化しています。</span>
+    </p>
+  </footer>
+
+  <script src="i18n-en.js"></script>
+  <script src="i18n.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

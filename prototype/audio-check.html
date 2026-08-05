@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReactiveExtream — サウンド試聴</title>
+  <!-- 開発用の試聴ページ。公開はされるが検索結果には出さない -->
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    main { max-width: 720px; margin: 0 auto; padding: 24px 16px 60px; display: block; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    .lead { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+    table { width: 100%; border-collapse: collapse; background: var(--panel);
+            border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; font-size: 13px; }
+    th { background: var(--slot); font-size: 12px; }
+    td.id { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    td.when { color: var(--muted); }
+    button { min-height: 30px; padding: 3px 14px; border: 1px solid var(--accent);
+             border-radius: 999px; background: white; color: var(--accent); font-weight: 700; }
+    button:hover { background: #e7f5f2; }
+    .bgm-row { margin-top: 20px; padding: 14px; background: var(--panel);
+               border: 1px solid var(--line); border-radius: 8px; }
+    audio { width: 100%; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>サウンド試聴</h1>
+    <p class="lead">
+      各音を再生して、作り直したいものを伝えてください（<code>node tools/gen-audio.mjs &lt;id&gt;</code> で個別に再生成できます）。
+    </p>
+    <table>
+      <thead><tr><th>再生</th><th>id</th><th>ゲーム内で鳴る場面</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <div class="bgm-row">
+      <strong style="font-size: 13px;">bgm-main</strong> — ループ BGM（60秒）。継ぎ目が気になるか確認してください。
+      <audio controls loop src="assets/audio/bgm-main.mp3"></audio>
+    </div>
+  </main>
+
+  <script>
+    const SOUNDS = [
+      ["part-add", "パーツを追加したとき（並び替えも小音量で流用）"],
+      ["part-remove", "パーツを削除したとき"],
+      ["param-change", "パラメータを変更・ヒントを開いたとき"],
+      ["sweep-start", "再生ボタンで検査を開始したとき"],
+      ["judge-ok", "（現在未使用。クリア時は stage-clear を鳴らしている）"],
+      ["judge-ng", "ゴールライン到達時に不一致だったとき"],
+      ["error-x", "不一致かつ出力がエラー（✕）で終わったとき"],
+      ["stage-select", "ステージを切り替えたとき"],
+      ["cycle-card", "サイクル開始カードが出たとき"],
+      ["stage-clear", "ステージクリア"],
+      ["all-clear", "全ステージクリア"],
+    ];
+    const tbody = document.getElementById("rows");
+    for (const [id, when] of SOUNDS) {
+      const tr = document.createElement("tr");
+      const play = document.createElement("button");
+      play.textContent = "▶ 再生";
+      play.onclick = () => { new Audio(`assets/audio/${id}.mp3`).play(); };
+      const td1 = document.createElement("td"); td1.append(play);
+      const td2 = document.createElement("td"); td2.className = "id"; td2.textContent = id;
+      const td3 = document.createElement("td"); td3.className = "when"; td3.textContent = when;
+      tr.append(td1, td2, td3);
+      tbody.append(tr);
+    }
+  </script>
+</body>
+</html>

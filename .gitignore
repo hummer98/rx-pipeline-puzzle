@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+._*
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+
+# ローカル作業用（公開しない）
+/scratch/
+/local/
+*.local.*
+
+# Claude Code のローカル設定（skills は共有する）
+.claude/settings.local.json
+
+# ビルド成果物（本来ビルドしないが、Pages のローカル確認用）
+/_site/
+
+# secrets
+.env
+prototype/assets/audio/raw/

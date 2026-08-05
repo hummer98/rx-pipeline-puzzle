@@ -1,0 +1,72 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2026 Yuji Yamamoto
+
+適用範囲 / Scope
+----------------
+
+このライセンスは ReactiveExtream の「コンテンツ」に適用されます。
+
+  - `prototype/app.js` の `STAGES` 配列（94 ステージのレベルデザイン:
+    入力ストリーム、正解ストリーム、タイトル、ゴール文、ヒント、insight）
+  - `prototype/app.js` の `CYCLES`（サイクル構成と導入文）
+  - `docs/` 配下のすべての文書
+  - `assets/` 配下の画像
+  - README.md / README.en.md / CONTRIBUTING.md
+
+コード（オペレータ実装、評価器、差分判定、UI、CSS）は MIT です。LICENSE を参照。
+
+This license applies to the *content* of ReactiveExtream: the 94 stage
+definitions (`STAGES`) and cycle structure (`CYCLES`) in
+`prototype/app.js`, everything under `docs/` and `assets/`, and the
+README / CONTRIBUTING files. The *code* is MIT licensed; see LICENSE.
+
+
+許諾内容 / You are free to
+--------------------------
+
+  Share    — 複製・再配布（媒体・形式を問わない）
+  Adapt    — 改変・再構成・翻訳・二次利用（商用利用を含む）
+
+以下の条件のもとで:
+
+  Attribution / 表示
+    適切なクレジット（原作者名・作品名・元リポジトリへのリンク）を
+    表示し、ライセンスへのリンクを示し、変更した場合はその旨を明記
+    してください。
+
+  No additional restrictions / 追加の制限の禁止
+    法的手段や技術的手段によって、このライセンスが許諾する行為を
+    他者に制限してはなりません。
+
+
+クレジット記載例 / Suggested attribution
+----------------------------------------
+
+  ReactiveExtream のステージ定義 (c) 2026 Yuji Yamamoto — CC BY 4.0
+  https://github.com/hummer98/rx-pipeline-puzzle
+
+  Stage definitions from ReactiveExtream by Yuji Yamamoto,
+  licensed under CC BY 4.0.
+  https://github.com/hummer98/rx-pipeline-puzzle
+
+
+ライセンス全文 / Full legal text
+--------------------------------
+
+  https://creativecommons.org/licenses/by/4.0/legalcode
+  日本語版（参考訳）: https://creativecommons.org/licenses/by/4.0/deed.ja
+
+本ファイルは要約であり、法的効力を持つのは上記の全文です。
+
+
+無保証 / Disclaimer
+-------------------
+
+本コンテンツは現状有姿で提供され、明示黙示を問わずいかなる保証も
+ありません。
+
+Unless otherwise separately undertaken by the Licensor, to the extent
+possible, the Licensor offers the Licensed Material as-is and
+as-available, and makes no representations or warranties of any kind
+concerning the Licensed Material.
