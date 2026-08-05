@@ -26,7 +26,10 @@
   // ============================================================
   var CONFIG = {
     // "none" | "goatcounter" | "plausible" | "umami" | "cloudflare" | "endpoint"
-    provider: "none",
+    provider: "endpoint",
+
+    // どちらの面から送っているか（"game" = ReactiveExtream / "site" = hummer98.dev）
+    site: "game",
 
     // provider: "goatcounter" — https://<code>.goatcounter.com のサブドメイン部分
     goatcounterCode: "",
@@ -44,7 +47,8 @@
     cloudflareToken: "",
 
     // provider: "endpoint" — 自前コレクタへ JSON を POST
-    endpointUrl: "",
+    // 実体は Cloudflare Workers + D1（tools/collector/）。Cookie も IP も保存しない。
+    endpointUrl: "https://t.hummer98.dev/e",
 
     // 共通オプション
     respectDoNotTrack: true, // DNT / GPC が立っていたら送らない
@@ -193,6 +197,10 @@
       name: name,
       path: path,
       props: props || {},
+      site: CONFIG.site || "game",
+      // 流入元。コレクタ側でホスト名だけに落として保存する
+      ref: document.referrer || "",
+      lang: (document.documentElement.lang || "").slice(0, 2),
       ts: new Date().toISOString(),
     });
   }

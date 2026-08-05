@@ -64,11 +64,57 @@ GoatCounter や Cloudflare のようにパス単位でしか集計できない�
 
 ## 4. 計測サービスの選択
 
+### 現在の構成: 自前コレクタ（Cloudflare Workers + D1）
+
+外部サービスに依存せず、**データを自分で持つ**構成にしてあります。実装は [`tools/collector/`](../tools/collector/)。
+
+```
+ブラウザ ──POST──> https://t.hummer98.dev/e (Workers) ──> D1 (rx-metrics)
+```
+
+| 項目 | 値 |
+| --- | --- |
+| 受け口 | `https://t.hummer98.dev/e`（Worker 名 `rx-metrics`） |
+| 保存先 | D1 `rx-metrics` — 1 イベント 1 行（[`schema.sql`](../tools/collector/schema.sql)） |
+| 費用 | 無料枠内（D1 は 5GB / 書き込み 10 万行日、Workers は 10 万リクエスト日） |
+| 対象 | `site="game"`（本ゲーム）と `site="site"`（hummer98.dev の受注窓口）の**両方**を同じテーブルに集約 |
+
+同じテーブルに 2 面を入れているのは、**ゲーム → 受注窓口 → 問い合わせのファネルを 1 本の SQL で追う**ためです。
+
+ゲーム側の設定は `prototype/analytics.js` の CONFIG 3 行だけです。
+
+```js
+provider: "endpoint",
+site: "game",
+endpointUrl: "https://t.hummer98.dev/e",
+```
+
+受注窓口側（`hummer98/hummer98.github.io` の `index.html`）は、依存を増やさないため同等の処理を 20 行程度インラインで持たせています（`pageview` と `contact` のみ）。
+
+### ログの見方
+
+**1. ターミナルから定型クエリ**（[`tools/collector/queries.sql`](../tools/collector/queries.sql) にプレイ率・難易度の壁・流入元・ファネルを用意してあります）
+
+```sh
+npx wrangler d1 execute rx-metrics --remote --command "SELECT day, name, COUNT(*) n FROM events WHERE day >= date('now','-7 day') GROUP BY day, name ORDER BY day DESC"
+```
+
+Cloudflare ダッシュボードの D1 コンソールでも同じ SQL が打てます。
+
+**2. Claude Code に聞く。** `--json` で結果が返るので、「今週のプレイ率は」「どのステージで人が消えているか」と聞けば集計して答えられます。ダッシュボードを作る前に、まずこれで足ります。
+
+**3. 週次サマリを Discord に流す**（未実装）。Cron Triggers で集計して投稿する。数字は「見に行く」より「流れてくる」ほうが続きます。
+
+HTML のダッシュボードは、数字が動き始めてから検討すれば十分です。
+
+### 乗り換える場合
+
 `analytics.js` の `CONFIG.provider` を切り替えるだけで乗り換えられます。ゲーム側（`app.js`）の変更は不要です。
 
 | プロバイダ | 費用 | Cookie | カスタムイベント | 備考 |
 | --- | --- | --- | --- | --- |
-| **GoatCounter** ★推奨 | 個人利用は無料 | なし | ○（パスとして記録） | 上記の設計と最も相性が良い。同意バナー不要 |
+| **自前コレクタ** ★採用中 | 無料枠内 | なし | ○ | Workers + D1。データを自分で持てる。上表参照 |
+| GoatCounter | **個人利用のみ**無料 | なし | ○（パスとして記録） | 手軽。商用サイトは有料プラン（$5/月〜）が要る |
 | Plausible | 有料（$9/月〜） | なし | ○（props 付き） | 見た目とダッシュボードが最良。セルフホストも可 |
 | Umami Cloud | 無料枠あり | なし | ○（props 付き） | セルフホストも可 |
 | Cloudflare Web Analytics | 無料 | なし | **×** | PV のみ。**プレイ回数もクリア数も取れない** |
@@ -97,7 +143,10 @@ GoatCounter や Cloudflare のようにパス単位でしか集計できない�
 この設計は「同意バナーを出さなくてよい状態」を維持することを前提にしています。壊さないでください。
 
 - Cookie / `localStorage` による**訪問者 ID を作らない**（重複抑止フラグは値が `"1"` のみで、送信もしない）
-- IP アドレス・User-Agent は計測サービス側の既定処理に委ねる（自前で保存しない）
+- **IP アドレスは保存しない。** User-Agent も文字列としては保存せず、`mobile` / `desktop` の 2 値にだけ落とす
+- 流入元は**ホスト名だけ**に切り詰めて保存する（クエリ付き URL は個人を特定しうるため捨てる）
+- 国コード（`request.cf.country`）は保存する。地域分布より粗い情報は取らない
+- コレクタは自サイト以外の Origin からの送信を受け付けない（403）。イベント名もホワイトリスト方式
 - `navigator.doNotTrack` / `navigator.globalPrivacyControl` が有効なら送信しない
 - `localhost` / `*.local` / `file://` では送信しない（開発が数字を汚さないため）
 - 1 セッションあたりの送信上限 300 件（暴走時のストッパー）
@@ -110,5 +159,5 @@ GoatCounter や Cloudflare のようにパス単位でしか集計できない�
 1. まず「その数字を見て**何を変えるのか**」を 1 行で書けるか確認する。書けないなら足さない。
 2. `app.js` から `track(name, props)` / `trackOnce(key, name, props, scope)` を呼ぶ。プロバイダ固有の API は絶対に直接呼ばない。
 3. カーディナリティを確認する。仮想パスが数百通りに散るイベントは、母数が小さすぎて読めません。
-4. **ページ遷移を伴うクリックを計測しない。** 現在の送信はピクセル GET なので、遷移が始まると取りこぼします。外部リンクや CTA のクリックを測る必要が出たら、`analytics.js` に `sendBeacon`（POST）で送れるプロバイダを足すか、リンクの遷移を数十 ms 遅延させる実装を追加してください。
+4. **ページ遷移を伴うクリックは、自前コレクタ構成でのみ計測してよい。** 現在の `endpoint` 送信は `fetch(..., { keepalive: true })` なので、遷移が始まっても送信は完了します（`outbound` / `contact` はこれに依存）。GoatCounter 等のピクセル GET に戻す場合は取りこぼすので、その時は計測をやめるか遷移を遅延させてください。
 5. この表に 1 行追加する。

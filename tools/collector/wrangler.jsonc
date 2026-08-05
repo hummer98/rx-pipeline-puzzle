@@ -1,0 +1,20 @@
+{
+  // 計測コレクタ。デプロイ: cd tools/collector && npx wrangler deploy
+  "name": "rx-metrics",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+
+  "observability": { "enabled": true },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rx-metrics",
+      "database_id": "f0edd640-b585-4e92-a999-3fa59b108a7b"
+    }
+  ],
+
+  // t.hummer98.dev を Worker 専用のホスト名として割り当てる。
+  // ルート（hummer98.dev）と www は GitHub Pages のまま・プロキシオフで触らない。
+  "routes": [{ "pattern": "t.hummer98.dev", "custom_domain": true }]
+}
