@@ -14,8 +14,8 @@
 //   - "webaudio": http(s) 配信時。GainNode でバスを組む
 //   - "element" : file:// で開いたとき。要素の volume / playbackRate で代替
 //
-// 設定は localStorage に保存。BGM は既定オフ（学習ツールとして不意の音楽を避ける）、
-// 効果音は既定オン。
+// 設定は localStorage に保存。BGM・効果音とも既定オン。BGM は効果音より十分下げた
+// 音量から始め、ヘッダーのスピーカーボタンで調整・ミュートできる。
 // ============================================================
 
 const GameAudio = (() => {
@@ -37,7 +37,7 @@ const GameAudio = (() => {
     "all-clear": -1,
   };
 
-  const defaults = { master: 0.8, music: 0.0, sfx: 0.8, muted: false };
+  const defaults = { master: 0.8, music: 0.6, sfx: 0.8, muted: false };
   let settings = load();
 
   let mode = "idle";           // idle | webaudio | element | none

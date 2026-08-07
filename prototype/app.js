@@ -3845,6 +3845,12 @@ function renderNodePanel(nodesEl, addButtonsEl, list, types, full, placeholder) 
   }
 }
 
+// 時間系パラメータの上限。タイムラインの外に置いても意味がないので、
+// ステージの長さで頭打ちにする。
+function timeMax() {
+  return currentStage()?.duration ?? 20;
+}
+
 function buildNodeCard(node, index, list) {
   const def = OPERATOR_DEFS[node.type];
   const desc = el("span", { class: "node-desc" }, def.describe(node.params));
@@ -3852,19 +3858,90 @@ function buildNodeCard(node, index, list) {
 
   const params = el("div", { class: "node-params" });
 
-  const numberInput = (key, min) =>
-    el("input", {
-      type: "number", step: "1", min: String(min), value: String(node.params[key]),
-      oninput: (e) => {
-        const v = e.target.valueAsNumber;
-        if (Number.isFinite(v)) {
-          node.params[key] = v;
-          refreshDesc();
-          GameAudio.play("param-change", { db: -6 });
-          recompute();
-        }
-      },
+  // 数値はキーボード入力させず、−/+ のボタンだけで動かす。
+  // ネイティブの number スピナーは当たり判定が小さく、スマホでは
+  // キーボードまで出てしまって操作にならないため。
+  let lastStepSound = 0;
+  const stepSound = () => {
+    // 長押しの連射で音が機関銃にならないよう間引く
+    const now = performance.now();
+    if (now - lastStepSound < 110) return;
+    lastStepSound = now;
+    GameAudio.play("param-change", { db: -6 });
+  };
+
+  const holdRepeat = (btn, step) => {
+    let delayTimer = null;
+    let repeatTimer = null;
+    const stop = () => {
+      clearTimeout(delayTimer);
+      clearInterval(repeatTimer);
+      delayTimer = repeatTimer = null;
+    };
+    const tick = () => {
+      // 再描画でボタンが外れたら連射も止める（外れた DOM に打ち続けない）
+      if (!btn.isConnected) { stop(); return; }
+      step();
+    };
+    btn.addEventListener("pointerdown", (ev) => {
+      if (ev.button > 0) return;
+      ev.preventDefault(); // 長押しでの選択・スクロールを抑える
+      stop(); // 連打で前回のタイマーが残ると、離しても止まらなくなる
+      step();
+      delayTimer = setTimeout(() => { repeatTimer = setInterval(tick, 90); }, 400);
+      const release = () => {
+        stop();
+        window.removeEventListener("pointerup", release);
+        window.removeEventListener("pointercancel", release);
+      };
+      window.addEventListener("pointerup", release);
+      window.addEventListener("pointercancel", release);
     });
+  };
+
+  const numberInput = (key, min, max = 99) => {
+    let dec = null;
+    let inc = null;
+
+    const value = el("span", {
+      class: "stepper-value",
+      role: "spinbutton", tabindex: "0",
+      "aria-valuemin": String(min), "aria-valuemax": String(max),
+      "aria-valuenow": String(node.params[key]),
+    }, String(node.params[key]));
+
+    const apply = (next) => {
+      const v = Math.min(max, Math.max(min, next));
+      dec.disabled = v <= min;
+      inc.disabled = v >= max;
+      if (v === node.params[key]) return;
+      node.params[key] = v;
+      value.textContent = String(v);
+      value.setAttribute("aria-valuenow", String(v));
+      refreshDesc();
+      stepSound();
+      recompute();
+    };
+
+    dec = el("button", { type: "button", class: "stepper-btn", "aria-label": t("node.decrease") }, "−");
+    inc = el("button", { type: "button", class: "stepper-btn", "aria-label": t("node.increase") }, "+");
+    holdRepeat(dec, () => apply(node.params[key] - 1));
+    holdRepeat(inc, () => apply(node.params[key] + 1));
+
+    // キーボードでも動かせるようにする（矢印・PageUp/Down・Home/End）
+    value.addEventListener("keydown", (ev) => {
+      const by = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 5, PageDown: -5 }[ev.key];
+      if (by !== undefined) apply(node.params[key] + by);
+      else if (ev.key === "Home") apply(min);
+      else if (ev.key === "End") apply(max);
+      else return;
+      ev.preventDefault();
+    });
+
+    dec.disabled = node.params[key] <= min;
+    inc.disabled = node.params[key] >= max;
+    return el("div", { class: "stepper" }, dec, value, inc);
+  };
 
   const selectInput = (key, options) => {
     const select = el("select", {
@@ -3897,17 +3974,18 @@ function buildNodeCard(node, index, list) {
       numberInput("seed", -99),
     );
   } else if (["take", "skip", "takeLast", "skipLast", "retry"].includes(node.type)) {
-    params.append(numberInput("count", node.type === "take" || node.type === "takeLast" ? 1 : 0));
+    const countMax = node.type === "retry" ? 5 : 20;
+    params.append(numberInput("count", node.type === "take" || node.type === "takeLast" ? 1 : 0, countMax));
   } else if (node.type === "elementAt") {
-    params.append(numberInput("n", 0));
+    params.append(numberInput("n", 0, 20));
   } else if (["delay", "throttleTime", "debounceTime", "auditTime", "timeout"].includes(node.type)) {
-    params.append(numberInput("d", 0));
+    params.append(numberInput("d", 0, timeMax()));
   } else if (["startWith", "mapTo", "defaultIfEmpty", "catchError"].includes(node.type)) {
     params.append(numberInput("value", -99));
   } else if (node.type === "takeUntil" || node.type === "skipUntil") {
-    params.append(numberInput("time", 0));
+    params.append(numberInput("time", 0, timeMax()));
   } else if (["mergeMap", "concatMap", "switchMap", "exhaustMap"].includes(node.type)) {
-    params.append(numberInput("count", 0), numberInput("d", 0));
+    params.append(numberInput("count", 0, 6), numberInput("d", 0, timeMax()));
   } else if (["zip", "combineLatest", "withLatestFrom"].includes(node.type)) {
     params.append(
       selectInput("op", Object.entries(COMBINE_OPS).map(([k, v]) => [k, v.expr])),

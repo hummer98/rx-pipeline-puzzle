@@ -173,7 +173,8 @@ type Stage = {
 
 ### パラメータ編集 UI
 
-- 自由入力の式（eval）は使わず、演算子はセレクト、数値は number input で編集する。
+- 自由入力の式（eval）は使わず、演算子はセレクト、**数値は −/+ ボタンのステッパー**で編集する。キーボード入力欄は置かない（ネイティブの number スピナーは当たり判定が小さく、スマホではソフトキーボードまで出てしまうため）。長押しで連射（400ms 後に 90ms 間隔）、値は `role="spinbutton"` でフォーカスでき矢印キー・PageUp/Down・Home/End でも動く。
+- 数値には上下限を持たせ、端ではボタンを無効化する。時間系（`delay` / `throttleTime` / `debounceTime` / `auditTime` / `timeout` / `takeUntil(t)` 等）の上限は**そのステージの `duration`**（タイムラインの外は意味がないため）。個数系は 20、`retry` は 5、`mergeMap` 系の count は 6、値・seed 系は ±99。
 - パネルごとに削除・左右移動ボタンを持つ。ドラッグ&ドロップは v0 では実装しない。
 - ステージの `maxNodes` に達したら追加ボタンを無効化する。
 
@@ -196,7 +197,7 @@ type Stage = {
 - 生成後は ffmpeg で後処理する: 無音のトリム → `loudnorm`（SFX は I=-16、BGM は I=-18）→ `alimiter` でクリップ防止。生成直後の raw は `prototype/assets/audio/raw/`（gitignore）に残し、後処理のやり直しで API を再度叩かずに済ませる。
 - 実装は `prototype/audio.js`（`GameAudio`）。**Master ← { Music, Sfx }** のバス構成で、スライダー値(0..1)は -40dB〜0dB の対数カーブに変換して適用する。効果音は再生ごとに ±3% のピッチ揺らぎを与え、連打時の機械的な反復を防ぐ。クリア演出中は Music を 25% にダッキングして戻す。
 - 再生経路は 2 系統。`file://` では `fetch` がブロックされ `decodeAudioData` が使えないため、`HTMLAudioElement` にフォールバックする（`GameAudio.mode()` が `webaudio` / `element` を返す）。どちらでも音量・ピッチ揺らぎ・ダッキングは同等に動く。
-- 設定は localStorage（キー `rx-pipeline-puzzle/audio`）。**BGM は既定オフ**（学習ツールとして不意の音楽を避ける）、効果音は既定オン。ヘッダーのスピーカーボタンからミュートと3系統の音量を操作する。ブラウザの自動再生規制に合わせ、最初のポインタ操作かキー入力で `unlock()` してからデコードする。
+- 設定は localStorage（キー `rx-pipeline-puzzle/audio`）。**BGM・効果音とも既定オン**（BGM は `music: 0.6` と効果音より控えめに始める）。ヘッダーのスピーカーボタンからミュートと3系統の音量を操作する。ブラウザの自動再生規制に合わせ、最初のポインタ操作かキー入力で `unlock()` してからデコードする。
 - 音源の試聴用ページ: `prototype/audio-check.html`（各音の再生ボタンと、ゲーム内で鳴る場面の対応表）。
 
 - **学習支援**: クリア時にプレイヤーの解を RxJS コードとして自動生成表示（簡略化オペレータには「本物はこう違う」注記）＋ステージの `insight`（現実での使いどころ）。「もう表示しない」チェックで非表示化でき、画面下部のボタンで復元。パーツボタンのホバーにはテキストマーブル図（`-12-3--4-|` 記法）で before/after を表示。3段階ヒント（考え方→パーツ名→完全解、`SOLUTIONS` の正準解から自動生成。不一致3回で点滅誘導）。サイクル開始時に1度だけテーマカードを表示（localStorage 記録）。Cycle 9 はスペックモード（正解レーンは最初の判定確定まで非表示、差分色も出さない）。Cycle 1: 基礎編（map/filter/take/skip）、Cycle 2: 状態編（scan/distinctUntilChanged/takeWhile/startWith）、Cycle 3: 時間編（delay/throttleTime/debounceTime/reduce）、Cycle 4: 変換編（mapTo/index/timestamp/last）、Cycle 5: 位置編（takeLast/skipLast/elementAt/defaultIfEmpty）、Cycle 6: 選別編（distinct/takeUntil/skipUntil/auditTime）、Cycle 7: 合流編（merge/zip/combineLatest/withLatestFrom）、Cycle 8: 制御編（sample/takeUntil(B)/skipUntil(B)/race）。ステージ選択はサイクルごとの optgroup で区切る。

@@ -466,8 +466,67 @@ main {
   background: white;
 }
 
-.node-params input[type="number"] {
-  width: 62px;
+/* 数値は −/+ のボタンだけで動かす（ネイティブのスピナーは当たり判定が小さすぎる）。
+   長押しで連射、値の部分はフォーカスして矢印キーでも動かせる。 */
+.stepper {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: white;
+}
+
+.stepper-btn {
+  min-width: 30px;
+  min-height: 30px;
+  padding: 0;
+  border: none;
+  background: #f1f5f9;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 700;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.stepper-btn:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.stepper-btn:active:not(:disabled) {
+  background: var(--accent);
+  color: white;
+}
+
+.stepper-btn:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+.stepper-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  padding: 0 6px;
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+}
+
+.stepper-value:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: -2px;
+}
+
+@media (max-width: 640px) {
+  .stepper-btn { min-width: 40px; min-height: 36px; font-size: 17px; }
+  .stepper-value { min-width: 44px; font-size: 14px; }
 }
 
 .node-tools {

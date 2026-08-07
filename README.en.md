@@ -31,7 +31,7 @@ Grading looks only at the output stream, so **alternative solutions pass natural
 
 When you clear a stage, your pipeline is **generated as real RxJS code**, with a note wherever this game's semantics deliberately differ from the real operator.
 
-There is music and sound too. Since this is a learning tool, **music is off by default** and sound effects are on; both are adjustable from the speaker button in the header.
+There is music and sound too. **Both are on by default** (music starts noticeably quieter than the effects). Mute and the three volume sliders live behind the speaker button in the header, and your settings are remembered.
 
 ### Operators (39)
 
@@ -75,7 +75,7 @@ The full semantics are specified in [`docs/implementation-plan.md`](docs/impleme
 
 ## Analytics & privacy
 
-Analytics are **off by default** — `prototype/analytics.js` ships with `provider: "none"` and sends nothing. Even when enabled it uses no cookies or device identifiers, sends only page views and progress milestones, honours `Do Not Track` / `Global Privacy Control`, and stays silent on `localhost` and `file://`. See [`docs/metrics.md`](docs/metrics.md).
+The public site uses a self-hosted collector (Cloudflare Workers + D1, see [`tools/collector/`](tools/collector/)). It uses **no cookies and no device identifiers, never stores IP addresses** (the User-Agent is reduced to `mobile` / `desktop`), sends only page views and progress milestones — never your input or solutions — honours `Do Not Track` / `Global Privacy Control`, and stays silent on `localhost` and `file://`. Point `endpointUrl` elsewhere, or set `provider: "none"` in `prototype/analytics.js`, and your clone sends nothing at all. See [`docs/metrics.md`](docs/metrics.md).
 
 ## License
 
