@@ -707,6 +707,20 @@ main {
   background: #111827;
 }
 
+/* クリア画面の出口。派手にせず、感心している瞬間にそっと置く */
+.clear-cta {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.clear-cta a {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 /* ---------- clear overlay ---------- */
 
 .clear-overlay {

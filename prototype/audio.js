@@ -20,7 +20,12 @@
 
 const GameAudio = (() => {
   const SETTINGS_KEY = "rx-pipeline-puzzle/audio";
-  const BASE = "assets/audio/";
+  // 音源はドキュメントではなく「このスクリプトの位置」を基準に解決する。
+  // /en/ の薄いコピーから ../audio.js を読み込んでも取り違えないため。
+  const BASE = (() => {
+    const self = document.currentScript?.src;
+    return self ? new URL("assets/audio/", self).href : "assets/audio/";
+  })();
 
   const SFX_IDS = [
     "part-add", "part-remove", "param-change", "sweep-start",

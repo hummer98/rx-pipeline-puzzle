@@ -299,4 +299,17 @@
   } else {
     RxTrack.pageview();
   }
+
+  // 出口リンク（data-outbound="hummer98" など）のクリックを記録する。
+  // 送信は fetch(keepalive) なので、遷移が始まっても最後まで届く。
+  document.addEventListener("click", function (ev) {
+    var node = ev.target;
+    while (node && node.nodeType === 1) {
+      if (node.hasAttribute("data-outbound")) {
+        RxTrack.event("outbound", { to: node.getAttribute("data-outbound") });
+        return;
+      }
+      node = node.parentNode;
+    }
+  }, true);
 })(window);

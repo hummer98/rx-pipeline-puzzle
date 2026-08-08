@@ -23,6 +23,10 @@ const I18N = (() => {
       const saved = localStorage.getItem(KEY);
       if (SUPPORTED.includes(saved)) return saved;
     } catch { /* 続行 */ }
+    // ページ自身が言語を宣言していればそれに従う（/en/ の静的ページ用）。
+    // 初回訪問者とクローラはこれで英語ページを英語として受け取る。
+    const declared = document.documentElement.getAttribute("lang");
+    if (SUPPORTED.includes(declared)) return declared;
     return "ja";
   }
 
@@ -171,6 +175,9 @@ const I18N = (() => {
       "footer.top": "トップ",
       "footer.note": "— ReactiveExtream は RxJS を学ぶための<strong>非公式</strong>のファンプロジェクトで、 ReactiveX / RxJS 公式とは関係ありません。オペレータの挙動は学習用に一部簡略化しています。",
       "lang.label": "言語",
+      "cta.clear": "この 94 問は AI と作りました →",
+      "cta.clearLink": "作った人について",
+      "cta.footer": "作った人",
     },
 
     en: {
@@ -306,6 +313,9 @@ const I18N = (() => {
       "footer.top": "Home",
       "footer.note": "— ReactiveExtream is an <strong>unofficial</strong> fan project for learning RxJS, not affiliated with ReactiveX / RxJS. Some operator behaviour is simplified for teaching.",
       "lang.label": "Language",
+      "cta.clear": "These 94 puzzles were built with AI →",
+      "cta.clearLink": "about the author",
+      "cta.footer": "About the author",
     },
   };
 

@@ -33,6 +33,9 @@ jobs:
           cp -R prototype/. _site/
           mkdir -p _site/docs
           cp -R docs/. _site/docs/
+          # 英語ページ（/en/）を生成する。head だけ英語に差し替えた薄いコピーで、
+          # CSS と JS は 1 つ上を参照するため資産は二重にならない。
+          node tools/build-en.mjs _site
           # Jekyll の処理を無効化（_ で始まるファイルが消えるのを防ぐ）
           touch _site/.nojekyll
 

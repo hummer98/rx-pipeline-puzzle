@@ -3602,6 +3602,7 @@ const dom = {
   clearMessage: $("clear-message"),
   clearLearn: $("clear-learn"),
   clearCode: $("clear-code"),
+  clearCta: $("clear-cta"),
   clearInsight: $("clear-insight"),
   clearNotes: $("clear-notes"),
   chkHideLearn: $("chk-hide-learn"),
@@ -4190,6 +4191,9 @@ function showClearOverlay() {
     dom.chkHideLearn.checked = false;
   }
   dom.btnNext.hidden = isLast;
+  // 出口の導線。毎回出すと 94 回ぶんの雑音になるので、
+  // 端末での初クリアと全クリアのときだけ見せる。
+  dom.clearCta.hidden = !(allCleared || state.cleared.size <= 1);
   dom.clearOverlay.hidden = false;
   GameAudio.play(allCleared ? "all-clear" : "stage-clear", { duck: allCleared ? 4 : 2.5 });
 }

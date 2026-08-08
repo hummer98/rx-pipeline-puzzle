@@ -187,6 +187,7 @@ type Stage = {
 ### 多言語対応（日本語 / 英語）
 
 - 既定は日本語。トップページ右上の国旗ボタン（🇯🇵 / 🇺🇸）で切り替え、選択は localStorage（キー `rx-pipeline-puzzle/lang`）に保存してゲーム画面にも引き継ぐ。`?lang=en` / `?lang=ja` でも指定できる。切り替え時に `<html lang>` も更新する。
+- **英語ページは `/en/` に静的に生成する**（`tools/build-en.mjs`、Pages のワークフローで実行）。`?lang=en` だけでは canonical も OG も日本語のままで、クローラは JS を実行しないため「検索にも SNS カードにも英語版が存在しない」状態になる。生成物は head だけ英語に差し替えた薄いコピーで、CSS/JS は 1 つ上を参照するので資産は二重にならない。日英ページは `hreflang` で相互に指し合う。ページが `<html lang="en">` を宣言していれば `i18n.js` の `detect()` がそれを既定言語として拾う（優先順は `?lang=` > localStorage > ページ宣言 > 日本語）。
 - 実装は `prototype/i18n.js`（UI 文字列辞書と `t(key, params)`、`I18N.applyStatic()`）＋ `prototype/i18n-en.js`（英訳データ）。UI 文字列は `{name}` プレースホルダ付きのキーで引き、未翻訳キーは自動的に日本語へフォールバックする。
 - **ステージ定義（STAGES）と CYCLES は日本語を原本のまま保持**し、英語は `I18N_STAGES_EN` / `I18N_CYCLES_EN` で id をキーに上書きする。これにより STAGES 側は純データ（JSON 外出し可能）を維持できる。オペレータ説明とパラメータ表示（`describe`）も `t("op.xxx", …)` 経由。
 - HTML の静的文字列は `data-i18n`（textContent）／ `data-i18n-html`（innerHTML）／ `data-i18n-title`（title 属性）で印を付け、マークアップには日本語の原文を書いたまま `applyStatic()` で差し替える。JS が動かない場合でも日本語では読める状態を保つため。

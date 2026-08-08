@@ -6,6 +6,9 @@
   <title>ReactiveExtream — RxJS オペレータ パズル (marble diagram)</title>
   <meta name="description" content="RxJS / ReactiveX の 39 オペレータをマーブル図の上で組み立てる 94 ステージのパズル。クリアすると自分の解が RxJS のコードとして生成されます。">
   <link rel="canonical" href="https://hummer98.dev/rx-pipeline-puzzle/game.html">
+  <link rel="alternate" hreflang="ja" href="https://hummer98.dev/rx-pipeline-puzzle/game.html">
+  <link rel="alternate" hreflang="en" href="https://hummer98.dev/rx-pipeline-puzzle/en/game.html">
+  <link rel="alternate" hreflang="x-default" href="https://hummer98.dev/rx-pipeline-puzzle/game.html">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="ReactiveExtream">
@@ -131,6 +134,11 @@
         <p class="clear-notes" id="clear-notes"></p>
         <label class="clear-hide"><input type="checkbox" id="chk-hide-learn"> <span data-i18n="clear.hideLearn">この解説をもう表示しない</span></label>
       </div>
+      <p class="clear-cta" id="clear-cta" hidden>
+        <span data-i18n="cta.clear">この 94 問は AI と作りました →</span>
+        <a href="https://hummer98.dev/" target="_blank" rel="noopener"
+           data-outbound="hummer98" data-i18n="cta.clearLink">作った人について</a>
+      </p>
       <div class="clear-actions">
         <button id="btn-next" class="primary" data-i18n="clear.next">次のステージへ</button>
         <button id="btn-close-overlay" data-i18n="clear.close">閉じる</button>
@@ -153,7 +161,8 @@
     <button id="btn-reset-learn" hidden data-i18n="clear.showLearnAgain">クリア時の解説を再び表示する</button>
     <p class="footer-note">
       <a href="index.html" data-i18n="footer.top">トップ</a> ・
-      <a href="https://github.com/hummer98/rx-pipeline-puzzle">GitHub</a>
+      <a href="https://github.com/hummer98/rx-pipeline-puzzle">GitHub</a> ・
+      <a href="https://hummer98.dev/" target="_blank" rel="noopener" data-outbound="hummer98" data-i18n="cta.footer">作った人</a>
       <span data-i18n-html="footer.note">— ReactiveExtream は RxJS を学ぶための<strong>非公式</strong>のファンプロジェクトで、
       ReactiveX / RxJS 公式とは関係ありません。オペレータの挙動は学習用に一部簡略化しています。</span>
     </p>
