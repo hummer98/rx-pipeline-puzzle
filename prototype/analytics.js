@@ -131,10 +131,15 @@
     img.src = url;
   }
 
-  function postJson(url, body) {
+  // beaconType: sendBeacon の Content-Type。
+  // application/json はクロスオリジンだとプリフライトが要る扱いになり、
+  // sendBeacon はプリフライトを扱えないため **true を返したまま黙って捨てられる**。
+  // 自前コレクタには text/plain で送る（単純リクエストになる。サーバ側は
+  // Content-Type を見ずに本文を JSON として読む）。
+  function postJson(url, body, beaconType) {
     try {
       if (nav.sendBeacon) {
-        var blob = new Blob([JSON.stringify(body)], { type: "application/json" });
+        var blob = new Blob([JSON.stringify(body)], { type: beaconType || "application/json" });
         if (nav.sendBeacon(url, blob)) return;
       }
     } catch (e) {
@@ -193,16 +198,20 @@
   }
 
   function sendEndpoint(name, props, path) {
-    postJson(CONFIG.endpointUrl, {
-      name: name,
-      path: path,
-      props: props || {},
-      site: CONFIG.site || "game",
-      // 流入元。コレクタ側でホスト名だけに落として保存する
-      ref: document.referrer || "",
-      lang: (document.documentElement.lang || "").slice(0, 2),
-      ts: new Date().toISOString(),
-    });
+    postJson(
+      CONFIG.endpointUrl,
+      {
+        name: name,
+        path: path,
+        props: props || {},
+        site: CONFIG.site || "game",
+        // 流入元。コレクタ側でホスト名だけに落として保存する
+        ref: document.referrer || "",
+        lang: (document.documentElement.lang || "").slice(0, 2),
+        ts: new Date().toISOString(),
+      },
+      "text/plain;charset=UTF-8",
+    );
   }
 
   // Cloudflare Web Analytics は beacon スクリプトを1本挿すだけ（PV のみ）
