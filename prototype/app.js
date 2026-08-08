@@ -21,7 +21,7 @@
 // intro: サイクル開始時に1度だけ見せるカードの本文と新パーツ
 const CYCLES = [
   { title: "Cycle 1: 基礎編", size: 8, opsThrough: 4,
-    intro: "ストリームは「時間軸に並んだ値と完了」。まずは値を変え、選び、切り出す4つの基本から。",
+    intro: "ストリームは「時間軸に並んだ値」と、その終わりを告げる「完了（縦棒 ｜）」でできている。完了も位置を合わせる対象。まずは値を変え、選び、切り出す4つの基本から。",
     parts: "map / filter / take / skip" },
   { title: "Cycle 2: 状態編", size: 8, opsThrough: 8,
     intro: "「これまでに何が来たか」を覚えるオペレータたち。累積・変化検出・条件打ち切り・先頭挿入。",
@@ -73,7 +73,7 @@ const STAGES = [
   {
     id: "stage-01",
     title: "Stage 1: 2倍の世界",
-    goal: "map を使って、各値を 2 倍にした正解ストリームを作ろう。",
+    goal: "map を使って、各値を 2 倍にした正解ストリームを作ろう。（縦棒 ｜ はストリームの終わり。ここも正解と揃える必要がある）",
     duration: 8,
     input: {
       events: [
@@ -81,7 +81,7 @@ const STAGES = [
         { t: 3, value: 2 },
         { t: 5, value: 3 },
       ],
-      completeAt: 7,
+      completeAt: 6,
     },
     expected: {
       events: [
@@ -89,7 +89,7 @@ const STAGES = [
         { t: 3, value: 4 },
         { t: 5, value: 6 },
       ],
-      completeAt: 7,
+      completeAt: 6,
     },
     availableOperators: ["map"],
     maxNodes: 2,
@@ -3657,6 +3657,7 @@ function renderTrack(trackEl, { marks, completes }) {
         class: `complete-mark ${c.cls ?? ""}${c.x ? " complete-mark--x" : ""}`,
         style: `left:${timeToPercent(c.t, duration)}`,
         "data-ev-t": c.t,
+        title: c.x ? t("mark.errorTip", { t: c.t }) : t("mark.completeTip", { t: c.t }),
       }),
     );
   }

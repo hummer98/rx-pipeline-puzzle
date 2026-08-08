@@ -62,7 +62,7 @@ const I18N_RXNOTES_EN = {
 
 const I18N_CYCLES_EN = [
   { title: "Cycle 1: Basics",
-    intro: "A stream is values laid out on a timeline, plus a completion. Start with the four basics: change values, pick them, cut them.",
+    intro: "A stream is values laid out on a timeline, plus a completion (the bar ｜) that says it is over. The completion has to line up too. Start with the four basics: change values, pick them, cut them.",
     parts: "map / filter / take / skip" },
   { title: "Cycle 2: State",
     intro: "Operators that remember what came before: accumulate, detect change, cut on a condition, prepend a seed.",
@@ -100,7 +100,7 @@ const I18N_CYCLES_EN = [
 ];
 
 const I18N_STAGES_EN = {
-  "stage-01": { title: "Stage 1: Times two", goal: "Use map to double every value and reproduce the goal stream." },
+  "stage-01": { title: "Stage 1: Times two", goal: "Use map to double every value and reproduce the goal stream. (The bar ｜ marks the end of the stream — that has to line up with the goal too.)" },
   "stage-02": { title: "Stage 2: Three and up", goal: "Use filter to pass only the values that are 3 or greater." },
   "stage-03": { title: "Stage 3: Just the first few", goal: "Use take to pass only the first 3. Notice that take also pulls the completion earlier." },
   "stage-04": { title: "Stage 4: Drop the first ones", goal: "Use skip to drop the first 2. Unlike take, the completion does not move." },

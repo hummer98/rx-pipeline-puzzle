@@ -181,6 +181,17 @@ main {
   box-shadow: var(--shadow);
 }
 
+/* 入力と正解は「動かせないもの」。一段沈めて、唯一操作できる
+   「現在の出力」レーンが自然に前に出るようにする。 */
+.lane--given {
+  background: var(--slot, #eef2f7);
+  box-shadow: none;
+}
+
+.lane--given .track-line {
+  background: #c3ccda;
+}
+
 .lane-head {
   display: flex;
   justify-content: space-between;
