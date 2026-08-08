@@ -36,6 +36,9 @@ jobs:
           # 英語ページ（/en/）を生成する。head だけ英語に差し替えた薄いコピーで、
           # CSS と JS は 1 つ上を参照するため資産は二重にならない。
           node tools/build-en.mjs _site
+          # 資産 URL にコミット SHA を付ける。Pages の max-age=600 で
+          # 新旧の JS が混ざるのを防ぐ。
+          node tools/stamp-assets.mjs _site "${GITHUB_SHA::7}"
           # Jekyll の処理を無効化（_ で始まるファイルが消えるのを防ぐ）
           touch _site/.nojekyll
 
